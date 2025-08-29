@@ -3,15 +3,18 @@ import './App.css'
 import { Table } from './Table.jsx'
 
 const url = 'https://gist.githubusercontent.com/loniefink/df895e8eaccb46e8fb060cac99e53787/raw/3fbb43a098b316b1adc5ecf8e7071994ce69bb0d/cssNamedColors.csv'
+let message = '';
 const fetchText = async (url) => {
   const response = await fetch(url);
   return await response.text();
 }
-// colors is a promise
-const colors = fetchText(url).then((text) => {
-  //console.log(text);
-  let lines = text.split("\n"); //divide text into array of lines
-  let result = [];                  // prepare output array to be converted into json
+
+    /* 
+     *  the following lines all do the same thing as the 
+     *
+const textToJSON = (text) => {
+  let lines = text.split("\n");     //divide text into array of lines
+  let data = [];                  // prepare output array to be converted into json
   let headers = lines[0].split(",") // set 1st line as headers
   //console.log(headers);
   //console.log("headers.length",headers.length);
@@ -24,18 +27,34 @@ const colors = fetchText(url).then((text) => {
       obj[headers[j]] = currentLine[j]; // key => value, key = object[j], value = currentLine[j]
     }
 
-    result.push(obj);
+    data.push(obj);
   }
-  console.log(result);
-  return result; // JavaScript object
-  //return JSON.stringify(result);
+  console.log(data);
+  return data; // JavaScript object
+};
+*/
+// colors is a promise
+//const colors =
+fetchText(url).then((text) => {
+  //console.log(text);
+  const data = d3.csvParse(text);
+  console.log(data);
+  message += Math.round(text.length/1024) + ' kB';
+  message += '\n' + data.length + ' rows';
+  message += '\n' + data.columns.length + ' columns';
+  console.log(message);
+  /*
+   * alternative method
+  const data = textToJson(text);
+  */
+  return data
+  //return JSON.stringify(data);
 });
 
 const App = () => {
   const [count, setCount] = useState(0)
   return (
     <>
-      <Table colors={colors} />
     </>
   )
 }
