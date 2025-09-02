@@ -4,9 +4,9 @@ export const viz = vl
   )
   .encode(
     // lookup sort for vega-lite
-    vl.x().fieldN('country').sort('-y'), // fieldQ: quantitative (numerical), no zero baseline
+    vl.x().fieldN('country').sort("-y"), // fieldQ: quantitative (numerical), no zero baseline
     vl.y().fieldQ('population'),
-    //vl.color().fieldQ('weight'),
+    vl.color().fieldN('religion'),
     //vl.size().fieldQ('mpg').scale({ zero: false }),
     vl.tooltip().fieldN('population')
   );
