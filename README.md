@@ -10,7 +10,7 @@
 • ch3-mouse2
   • mouse capture for react
 • vega-lite-api
-  • yarn build from github repo
+  • yarn build: removed [github repo](https://vega.github.io/vega-lite-api/)
 • vega-lite-api-ex
   • V2 template, see readme
 • icerink
