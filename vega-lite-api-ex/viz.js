@@ -1,13 +1,16 @@
 import vl from 'vega-lite-api';
 export const viz = vl
-  .markBar(
+  .markPoint(
+    {
+      fill: true,
+      stroke: false,
+      size: 200,
+      opacity: 0.2
+    }
   )
   .encode(
-    // lookup sort for vega-lite
-    vl.x().fieldN('country').sort("-y"), // fieldQ: quantitative (numerical), no zero baseline
-    vl.y().fieldQ('population'),
-    vl.color().fieldN('religion'),
-    //vl.size().fieldQ('mpg').scale({ zero: false }),
-    vl.tooltip().fieldN('population')
+    vl.x().fieldQ('mpg').scale({ zero: false }), // fieldQ: quantitative (numerical), no zero baseline
+    vl.y().fieldQ('horsepower').scale({ zero: false }),
+    vl.tooltip().fieldN('name')
   );
 

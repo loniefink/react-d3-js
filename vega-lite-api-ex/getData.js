@@ -1,6 +1,6 @@
 import { csv } from 'd3';
 
-const csvUrl = 'https://gist.githubusercontent.com/curran/805413fb3b2efaada1ce/raw/f030ce7bd9a46f3d4c09b4c8db1729fab885cc33/religionByCountryTop5.csv'
+const csvUrl = 'https://gist.githubusercontent.com/curran/8c131a74b85d0bb0246233de2cff3f52/raw/194c2fc143790b937c42bf086a5a44cb3c55340e/auto-mpg.csv'
 
 export const getData = async() => {
   const data = await csv(csvUrl);
