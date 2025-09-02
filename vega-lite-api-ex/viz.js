@@ -1,16 +1,16 @@
 import vl from 'vega-lite-api';
 export const viz = vl
-  .markPoint(
+  .markLine(
     {
-      fill: true,
-      stroke: false,
-      size: 200,
-      opacity: 0.2
+      size: 5,
+      opacity: 1
     }
   )
   .encode(
-    vl.x().fieldQ('mpg').scale({ zero: false }), // fieldQ: quantitative (numerical), no zero baseline
-    vl.y().fieldQ('horsepower').scale({ zero: false }),
-    vl.tooltip().fieldN('name')
+    vl.x().fieldT('timestamp'), // fieldQ: quantitative (numerical), no zero baseline
+    vl.y().fieldQ('temperature'),
+    //vl.color().fieldQ('weight'),
+    //vl.size().fieldQ('mpg').scale({ zero: false }),
+    vl.tooltip().fieldN('temperature')
   );
 
