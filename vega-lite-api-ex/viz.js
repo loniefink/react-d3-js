@@ -1,19 +1,15 @@
 import vl from 'vega-lite-api';
 export const viz = vl
-  .markCircle(
+  .markLine(
     {
-      size: 200,
-      opacity: 0.7
+      size: 3,
     }
   )
   .encode(
-
-
-// x and y positions are good to use on any data
 //|------------------------------|
 //| channels   | Cat | Ord | Qan |
 //| :--------: | :-: | :-: | :-: |
-//| x          |  X  |     |     |
+//| x          |     |     |  X  |
 //| y          |     |     |  X  |
 //| size       |     |     |     |
 //| luminosity |     |     |     |
@@ -23,8 +19,10 @@ export const viz = vl
 //• _Ord: Ordered_
 //• _Qan: Quantitative_
 //
-    vl.x().fieldO('origin'), // fieldQ: quantitative (numerical), no zero baseline
-    vl.y().fieldQ('horsepower').scale({ zero: false }),
-    vl.tooltip().fieldN('name').title('x and y positions are good to use on any data')
+    vl.x().fieldT('timestamp'), // fieldQ: quantitative (numerical), no zero baseline
+    vl.y().fieldQ('temperature').scale({ zero: false }),
+    //vl.color().fieldQ('weight'),
+    //vl.size().fieldQ('mpg').scale({ zero: false }),
+    vl.tooltip().fieldN('temperature')
   );
 
