@@ -1,8 +1,12 @@
+'use strict';
+
 import React, { useState, useCallback, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'ReactDOM';
 import { csv, arc, pie } from 'd3';
 
-const csvUrl = 'https://gist.githubusercontent.com/curran/b236990081a24761f7000567094914e0/raw/cssNamedColors.csv';
+const csvUrl =
+  'https://gist.githubusercontent.com/curran/b236990081a24761f7000567094914e0/raw/cssNamedColors.csv';
+
 const width = 960;
 const height = 500;
 const centerX = width / 2;
@@ -19,37 +23,21 @@ const App = () => {
     csv(csvUrl).then(setData);
   }, []);
 
-  //console.log(data);
-  /*
   if (!data) {
+    return <pre>Loading...</pre>;
   }
-  */
-  return <pre>{data ? message(data) : 'Loading...'}</pre>;
 
-  // To compute the arcs manually (without d3.pie):
-  /*
   const colorPie = pie().value(1);
 
   return (
     <svg width={width} height={height}>
       <g transform={`translate(${centerX},${centerY})`}>
-        {
-          console.log(data);
-        };
-        {data.map((d, i) => (
-            <path
-              fill={d['RGB hex value']}
-              d={pieArc({
-                startAngle: (i / data.length) * 2 * Math.PI,
-                endAngle: ((i + 1) / data.length) * 2 * Math.PI
-              })}
-            />
-          ))};
-
+        {colorPie(data).map(d => (
+          <path fill={d.data['RGB hex value']} d={pieArc(d)} />
+        ))}
       </g>
     </svg>
   );
-  */
 };
 const rootElement = document.getElementById('root');
 ReactDOM.render(<App />, rootElement);

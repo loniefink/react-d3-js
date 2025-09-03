@@ -11,12 +11,14 @@ const center_y=(height/2);
 const initialMousePosition = { x: center_x, y: center_y };
 
 // cvs data config
-const url = 'https://gist.githubusercontent.com/loniefink/df895e8eaccb46e8fb060cac99e53787/raw/3fbb43a098b316b1adc5ecf8e7071994ce69bb0d/cssNamedColors.csv'
+const urlCSV = 'https://gist.githubusercontent.com/loniefink/df895e8eaccb46e8fb060cac99e53787/raw/3fbb43a098b316b1adc5ecf8e7071994ce69bb0d/cssNamedColors.csv'
 
-const fetchText = async (url) => {
-  const response = await fetch(url);
+/*
+const fetchText = async (urlCSV) => {
+  const response = await fetch(urlCSV);
   return await response.text();
 }
+*/
 
 const message = data => {
   let message = '';
@@ -35,7 +37,7 @@ const App = () => {
    * useEffect is used here to prevent repeated calls on every loop to host
    */
   useEffect(() => {
-    d3.csv(url).then(data => {
+    d3.csv(urlCSV).then(data => {
       setData(data)
     });
   }, []); // empty array implies single firing of function
