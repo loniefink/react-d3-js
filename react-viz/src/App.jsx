@@ -42,13 +42,14 @@ const App = () => {
     });
   }, []); // empty array implies single firing of function
 
-  return (
-    <>
-      <div className="bold">
-        Data is: {data ? message(data) : 'Loading...'}
-      </div>
-    </>
-  );
+    if (!data) {
+        return <div className="bold">'Loading...'</div>
+    }
+
+    console.log(data[0]);
+    console.log(data.length);
+
+  return data.map(d => <div style={{ backgroundColor: d['RGB hex value'],  width: width, height: (height/data.length) }}  />);
 };
 
 export default App
