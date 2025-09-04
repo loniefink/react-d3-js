@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { csv, scaleLinear, extent, format } from 'd3'
 import './App.css'
+import { Dropdown } from './Dropdown'
 
 const csvUrl = 'https://gist.githubusercontent.com/loniefink/e8a217b8acd62b259c380b2a9ed01305/raw/4cd2462336bfc82dc11e5e10e0b6537c7fe5ff9d/iris.csv';
 
@@ -66,11 +67,11 @@ function App() {
     <svg width={width} height={height}>
       <g transform={`translate(${margin.left},${margin.top})`}>
     // AxisBottom(xScale, innerHeight, xAxisTickFormat);
-      { xScale.ticks().map(tickValue => {
+      { xScale.ticks().map((tickValue, i) => {
 
         //console.log(tickValue);
         return (
-          <g className="tick" key={tickValue} transform={`translate(${xScale(tickValue)},0)`}>
+          <g className="tick" key={i} transform={`translate(${xScale(tickValue)},0)`}>
            <line y2={innerHeight} />
           <text key={tickValue} style={{ textAnchor: 'middle' }} dy=".71em" y={innerHeight + yTickOffset}>
             {xAxisTickFormat(tickValue)}
