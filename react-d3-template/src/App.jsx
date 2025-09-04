@@ -1,9 +1,9 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { csv, scaleLinear, extent, format } from 'd3'
+import { csv, scaleLinear, scaleTime, extent, timeFormat, line, curveNatural } from 'd3'
 import './App.css'
 
-const csvUrl = 'https://gist.githubusercontent.com/loniefink/e8a217b8acd62b259c380b2a9ed01305/raw/4cd2462336bfc82dc11e5e10e0b6537c7fe5ff9d/iris.csv';
+const csvUrl = 'https://gist.githubusercontent.com/loniefink/2ff9dd5a1e96e492f5ecd18dc7293f00/raw/2dd52c6ceebc5f2dee6c25824a21d0e472902e55/week_temperature_sf.csv';
 
 const width = 960;
 const height = 500;
@@ -12,7 +12,7 @@ const xAxisLabelOffset = 56;
 const yAxisLabelOffset = 45;
 const xTickOffset = 7;
 const yTickOffset = 10;
-const circleRadius = 7;
+const circleRadius = 3;
 
 /*
  *
@@ -24,11 +24,8 @@ function App() {
 
   useEffect(() => {
     const row = (d) => {
-      d.sepal_length = +d.sepal_length;
-      d.sepal_width = +d.sepal_width;
-      d.petal_length = +d.petal_length;
-      d.petal_width = +d.petal_width;
-      d.species = d.species;
+      d.timestamp = new Date(d.timestamp);
+      d.temperature = +d.temperature;
       return d;
     };
     csv(csvUrl, row).then(setData);
@@ -42,24 +39,24 @@ function App() {
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
 
-  const xValue = d => d.petal_length;
-  const xAxisLabel = 'Petal Length';
-  const yValue = d => d.sepal_width;
-  const yAxisLabel = 'Sepal Width';
+  const xValue = d => d.timestamp;
+  const xAxisLabel = 'Time';
+  const yValue = d => d.temperature;
+  const yAxisLabel = 'Temperature';
 
-  const siFormat = format('.2s');
-  const xAxisTickFormat = (tickValue) => siFormat(tickValue).replace('G', 'B');
+  const xAxisTickFormat = timeFormat("%a");
 
-  const xScale = scaleLinear()
+  const xScale = scaleTime()
     .domain(extent(data,xValue))
     .range([0, innerWidth])
     .nice();
 
   const yScale = scaleLinear()
     .domain(extent(data,yValue))
-    .range([0, innerHeight])
+    .range([innerHeight, 0])
+    .nice();
 
-  //console.log(scaleLinear().ticks());
+  console.log(data);
 
 
   return (
@@ -115,20 +112,26 @@ function App() {
       {xAxisLabel}
     </text>
 
-    // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
-      {
-        /* */
-        data.map(d => (
-          <circle
-            className="mark"
-            cx={xScale(xValue(d))}
-            cy={yScale(yValue(d))}
-            r={circleRadius}
-          >
-            <title>{xAxisTickFormat(xValue(d))}</title>
-          </circle>
-        ))
-      }
+      // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
+      // Line
+        <g className="marks">
+          <path 
+            d={line().x((d) => xScale(xValue(d))).y((d) => yScale(yValue(d))).curve(curveNatural)(data)}
+          />
+        {
+      // circles
+            data.map(d => (
+              <circle
+                //className="mark"
+                cx={xScale(xValue(d))}
+                cy={yScale(yValue(d))}
+                r={circleRadius}
+              >
+                <title>{xAxisTickFormat(xValue(d))}</title>
+              </circle>
+            ))
+        }
+        </g>
 
       </g>
     </svg>
