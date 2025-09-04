@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { json, geoPath, geoNaturalEarth1  } from 'd3'
+import { json, geoPath, geoNaturalEarth1, geoGraticule  } from 'd3'
 import { feature, mesh } from 'topojson-client';
 import './App.css'
 
@@ -11,6 +11,7 @@ const width = 960;
 const height = 500;
 const projection = geoNaturalEarth1(),
     path = geoPath(projection);
+const graticules = geoGraticule();
 /*
  *
  * App() 
@@ -46,6 +47,7 @@ function App() {
         <g className="marks">
       // paths
             <path className="oceans" d={path({type: 'Sphere'})} />
+            <path className="latAndLongLines" d={path(graticules())} />
             {
               data.land.features.map(feature => (
               // req projection
