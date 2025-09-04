@@ -14,6 +14,16 @@ const yAxisLabelOffset = 45;
 const xTickOffset = 7;
 const yTickOffset = 10;
 const circleRadius = 7;
+const initialXAttribute = 'sepal_length';
+const initialYAttribute = 'sepal_width';
+const attributes = [
+    { value: 'sepal_length', label: 'Sepal Length'},
+    { value: 'sepal_width', label: 'Sepal Width'},
+    { value: 'petal_length', label: 'Petal Length'},
+    { value: 'petal_width', label: 'Petal Width'},
+    { value: 'species', label: 'Species'}
+];
+
 
 /*
  *
@@ -22,6 +32,8 @@ const circleRadius = 7;
  */
 function App() {
   const [data, setData] = useState(null);
+  const [xAttribute, setXAttribute] = useState(initialXAttribute);
+  const [yAttribute, setYAttribute] = useState(initialYAttribute);
 
   useEffect(() => {
     const row = (d) => {
@@ -40,13 +52,25 @@ function App() {
     return <pre>Loading...</pre>
   }
 
+  const getLabel = (value) => {
+      for (let i=0; i< attributes.length; i++) {
+          if (attributes[i].value === value) {
+              console.log(attributes[i].label);
+              return attributes[i].label; 
+          }
+      }
+      return attributes[0].label; 
+  }
+
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
 
-  const xValue = d => d.petal_length;
-  const xAxisLabel = 'Petal Length';
-  const yValue = d => d.sepal_width;
-  const yAxisLabel = 'Sepal Width';
+    // xValue returns petal_length
+  const xValue = d => d[xAttribute];
+  const xAxisLabel = getLabel(xAttribute);
+  const yValue = d => d[yAttribute];
+  const yAxisLabel = getLabel(yAttribute);
+
 
   const siFormat = format('.2s');
   const xAxisTickFormat = (tickValue) => siFormat(tickValue).replace('G', 'B');
@@ -60,79 +84,90 @@ function App() {
     .domain(extent(data,yValue))
     .range([0, innerHeight])
 
+    const options1 = [];
+    const options2 = [];
+    const options3 = [];
+    const selectedValue = '';
   //console.log(scaleLinear().ticks());
 
 
+
   return (
-    <svg width={width} height={height}>
-      <g transform={`translate(${margin.left},${margin.top})`}>
-    // AxisBottom(xScale, innerHeight, xAxisTickFormat);
-      { xScale.ticks().map((tickValue, i) => {
+      <>
+          <label htmlFor="x-select">X:</label>
+          <Dropdown options={attributes} id="x-select" selectedValue={xAttribute} onSelectedValueChange={setXAttribute}/>
+          <label htmlFor="y-select">Y:</label>
+          <Dropdown options={attributes} id="y-select" selectedValue={yAttribute} onSelectedValueChange={setYAttribute}/>
+            <svg width={width} height={height}>
+              <g transform={`translate(${margin.left},${margin.top})`}>
+            // AxisBottom(xScale, innerHeight, xAxisTickFormat);
+              { xScale.ticks().map((tickValue, i) => {
 
-        //console.log(tickValue);
-        return (
-          <g className="tick" key={i} transform={`translate(${xScale(tickValue)},0)`}>
-           <line y2={innerHeight} />
-          <text key={tickValue} style={{ textAnchor: 'middle' }} dy=".71em" y={innerHeight + yTickOffset}>
-            {xAxisTickFormat(tickValue)}
-          </text>
-          </g>
-        )})}
+                //console.log(tickValue);
+                return (
+                  <g className="tick" key={i} transform={`translate(${xScale(tickValue)},0)`}>
+                   <line y2={innerHeight} />
+                  <text key={tickValue} style={{ textAnchor: 'middle' }} dy=".71em" y={innerHeight + yTickOffset}>
+                    {xAxisTickFormat(tickValue)}
+                  </text>
+                  </g>
+                )})}
 
-    // yAxisLabel
-      <text
-        className="axis-label"
-        textAnchor="middle"
-        transform={`translate(${-yAxisLabelOffset}, ${innerHeight / 2}) rotate(-90)`}
-      >
-      {yAxisLabel}
-      </text>
+            // yAxisLabel
+              <text
+                className="axis-label"
+                textAnchor="middle"
+                transform={`translate(${-yAxisLabelOffset}, ${innerHeight / 2}) rotate(-90)`}
+              >
+              {yAxisLabel}
+              </text>
 
-    // AxisLeft
-      { yScale.ticks().map(tickValue => {
+            // AxisLeft
+              { yScale.ticks().map(tickValue => {
 
-        //console.log(tickValue);
-        return (
-        <g className="tick" key={tickValue} transform={`translate(0,${yScale(tickValue)})`}>
-         <line x2={innerWidth} />
-          <text
-            key={tickValue}
-            style={{ textAnchor: 'end' }}
-            x={-xTickOffset}
-            dy=".32em"
-          >
-            {tickValue}
-          </text>
-        </g>
-      )})}
+                //console.log(tickValue);
+                return (
+                <g className="tick" key={tickValue} transform={`translate(0,${yScale(tickValue)})`}>
+                 <line x2={innerWidth} />
+                  <text
+                    key={tickValue}
+                    style={{ textAnchor: 'end' }}
+                    x={-xTickOffset}
+                    dy=".32em"
+                  >
+                    {tickValue}
+                  </text>
+                </g>
+              )})}
 
-    // xAxisLabel
-    <text
-        className="axis-label"
-        textAnchor="middle"
-        x={innerWidth / 2}
-        y={innerHeight + xAxisLabelOffset}
-    >
-      {xAxisLabel}
-    </text>
+            // xAxisLabel
+            <text
+                className="axis-label"
+                textAnchor="middle"
+                x={innerWidth / 2}
+                y={innerHeight + xAxisLabelOffset}
+            >
+              {xAxisLabel}
+            </text>
 
-    // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
-      {
-        /* */
-        data.map(d => (
-          <circle
-            className="mark"
-            cx={xScale(xValue(d))}
-            cy={yScale(yValue(d))}
-            r={circleRadius}
-          >
-            <title>{xAxisTickFormat(xValue(d))}</title>
-          </circle>
-        ))
-      }
+            // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
+              {
+                /* */
+                data.map(d => (
+                  <circle
+                    className="mark"
+                    cx={xScale(xValue(d))}
+                    cy={yScale(yValue(d))}
+                    r={circleRadius}
+                  >
+                    <title>{xAxisTickFormat(xValue(d))}</title>
+                  </circle>
+                ))
+              }
 
-      </g>
-    </svg>
+              </g>
+            </svg>
+      </>
   )
 }
 
