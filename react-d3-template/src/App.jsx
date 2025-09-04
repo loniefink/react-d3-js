@@ -1,61 +1,136 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { json, geoPath, geoNaturalEarth1, geoGraticule  } from 'd3'
-import { feature, mesh } from 'topojson-client';
+import { csv, scaleLinear, extent, format } from 'd3'
 import './App.css'
 
-// Data
-const jsonUrl = 'https://unpkg.com/world-atlas@2.0.2/countries-50m.json';
+const csvUrl = 'https://gist.githubusercontent.com/loniefink/e8a217b8acd62b259c380b2a9ed01305/raw/4cd2462336bfc82dc11e5e10e0b6537c7fe5ff9d/iris.csv';
 
 const width = 960;
 const height = 500;
-const projection = geoNaturalEarth1(),
-    path = geoPath(projection);
-const graticules = geoGraticule();
+const margin = { top: 20, right: 30, bottom: 65, left: 90 };
+const xAxisLabelOffset = 56;
+const yAxisLabelOffset = 45;
+const xTickOffset = 7;
+const yTickOffset = 10;
+const circleRadius = 7;
+
 /*
  *
  * App() 
  *
  */
 function App() {
-  // Data
   const [data, setData] = useState(null);
 
   useEffect(() => {
-    json(jsonUrl).then(topojsonData => {
-      const {countries, land} = topojsonData.objects;
-      // exclude outer strokes and only include inner strokes
-      setData({
-        land: feature(topojsonData, land),
-        interiors: mesh(topojsonData, countries, (a, b) => a !== b)
-      });
-    });
+    const row = (d) => {
+      d.sepal_length = +d.sepal_length;
+      d.sepal_width = +d.sepal_width;
+      d.petal_length = +d.petal_length;
+      d.petal_width = +d.petal_width;
+      d.species = d.species;
+      return d;
+    };
+    csv(csvUrl, row).then(setData);
   }, []);
   
-  // topojson data requires transformation to geojson for easier presentation w/ d3
 
   if (!data) {
     return <pre>Loading...</pre>
   }
 
-  //console.log(feature);
-  console.log(data);
+  const innerHeight = height - margin.top - margin.bottom;
+  const innerWidth = width - margin.left - margin.right;
+
+  const xValue = d => d.petal_length;
+  const xAxisLabel = 'Petal Length';
+  const yValue = d => d.sepal_width;
+  const yAxisLabel = 'Sepal Width';
+
+  const siFormat = format('.2s');
+  const xAxisTickFormat = (tickValue) => siFormat(tickValue).replace('G', 'B');
+
+  const xScale = scaleLinear()
+    .domain(extent(data,xValue))
+    .range([0, innerWidth])
+    .nice();
+
+  const yScale = scaleLinear()
+    .domain(extent(data,yValue))
+    .range([0, innerHeight])
+
+  //console.log(scaleLinear().ticks());
+
 
   return (
     <svg width={width} height={height}>
-      // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
-        <g className="marks">
-      // paths
-            <path className="oceans" d={path({type: 'Sphere'})} />
-            <path className="latAndLongLines" d={path(graticules())} />
-            {
-              data.land.features.map(feature => (
-              // req projection
-              // line string
-              <path className="land" key={feature.id} d={path(feature)} />
-            ))}
-            <path className="borders" d={path(data.interiors)} />
+      <g transform={`translate(${margin.left},${margin.top})`}>
+    // AxisBottom(xScale, innerHeight, xAxisTickFormat);
+      { xScale.ticks().map(tickValue => {
+
+        //console.log(tickValue);
+        return (
+          <g className="tick" key={tickValue} transform={`translate(${xScale(tickValue)},0)`}>
+           <line y2={innerHeight} />
+          <text key={tickValue} style={{ textAnchor: 'middle' }} dy=".71em" y={innerHeight + yTickOffset}>
+            {xAxisTickFormat(tickValue)}
+          </text>
+          </g>
+        )})}
+
+    // yAxisLabel
+      <text
+        className="axis-label"
+        textAnchor="middle"
+        transform={`translate(${-yAxisLabelOffset}, ${innerHeight / 2}) rotate(-90)`}
+      >
+      {yAxisLabel}
+      </text>
+
+    // AxisLeft
+      { yScale.ticks().map(tickValue => {
+
+        //console.log(tickValue);
+        return (
+        <g className="tick" key={tickValue} transform={`translate(0,${yScale(tickValue)})`}>
+         <line x2={innerWidth} />
+          <text
+            key={tickValue}
+            style={{ textAnchor: 'end' }}
+            x={-xTickOffset}
+            dy=".32em"
+          >
+            {tickValue}
+          </text>
         </g>
+      )})}
+
+    // xAxisLabel
+    <text
+        className="axis-label"
+        textAnchor="middle"
+        x={innerWidth / 2}
+        y={innerHeight + xAxisLabelOffset}
+    >
+      {xAxisLabel}
+    </text>
+
+    // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
+      {
+        /* */
+        data.map(d => (
+          <circle
+            className="mark"
+            cx={xScale(xValue(d))}
+            cy={yScale(yValue(d))}
+            r={circleRadius}
+          >
+            <title>{xAxisTickFormat(xValue(d))}</title>
+          </circle>
+        ))
+      }
+
+      </g>
     </svg>
   )
 }
