@@ -8,7 +8,6 @@ pre {
 }
 .tick text {
   fill: #635F5D;
-  cursor: default;
 }
 .marks path.land {
   fill: #B3DBA4;
