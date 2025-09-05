@@ -80,6 +80,7 @@ pre {
 }
 .tick text {
   fill: #635F5D;
+  cursor: default;
 }
 .mark {
   /* over-rides color from colorScale

@@ -60,7 +60,7 @@ function App() {
     return <pre>Loading...</pre>
   }
 
-  console.log(hoveredValue);
+  //console.log(hoveredValue);
   const uniqueSpecies = [...new Set(data.map(d=> d.species))];
 
   const getLabel = (value) => {
@@ -75,7 +75,7 @@ function App() {
 
   const onHover = (hoveredValue) => {
     setHoveredValue(hoveredValue);
-    console.log(hoveredValue)
+    //console.log(hoveredValue)
   }
 
   const innerHeight = height - margin.top - margin.bottom;
@@ -155,9 +155,15 @@ function App() {
                   {
                       colorScale.domain().map((domainValue,i) => {
                           return (
-                              <g className="legend-item" transform={`translate(40,${i*30})`} onMouseEnter={setHoveredValue => onHover(domainValue)}>
+                              <g
+                                  className="legend-item"
+                                  transform={`translate(40,${i*30})`}
+                                  onMouseEnter={() => onHover(domainValue)}
+                                  onMouseLeave={() => onHover(null)}
+                                  opacity={hoveredValue && domainValue !== hoveredValue ? 0.2 : 1}
+                              >
                                 <circle fill={colorScale(domainValue)} r={circleRadius} />
-                                <text dx=".75em" dy=".32em">{domainValue}</text>
+                                <text className="tick" dx=".75em" dy=".32em">{domainValue}</text>
                               </g>
                           )
                       })
@@ -213,6 +219,24 @@ function App() {
               {xAxisLabel}
             </text>
             // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
+          <g opacity={hoveredValue ? 0.2 : 1}>
+              {
+                /* */
+                data.map((d,i) => (
+                  <circle
+                    key ={i}
+                    className="mark"
+                    fill={colorScale(colorValue(d))}
+                    cx={xScale(xValue(d))}
+                    cy={yScale(yValue(d))}
+                    r={circleRadius}
+                  >
+                    <title>{xAxisTickFormat(xValue(d))}</title>
+                  </circle>
+                ))
+              }
+          </g>
+
               {
                 /* */
                 filteredData.map((d,i) => (
