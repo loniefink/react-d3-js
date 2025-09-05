@@ -8,7 +8,7 @@ const csvUrl = 'https://gist.githubusercontent.com/loniefink/e8a217b8acd62b259c3
 
 const width = 960;
 const height = 500;
-const margin = { top: 20, right: 30, bottom: 65, left: 90 };
+const margin = { top: 20, right: 150, bottom: 65, left: 90 };
 const xAxisLabelOffset = 56;
 const yAxisLabelOffset = 45;
 const xTickOffset = 7;
@@ -23,6 +23,7 @@ const attributes = [
     { value: 'petal_width', label: 'Petal Width'},
     { value: 'species', label: 'Species'}
 ];
+const colorLegendLabel = 'Species';
 
 
 /*
@@ -57,7 +58,7 @@ function App() {
   const getLabel = (value) => {
       for (let i=0; i< attributes.length; i++) {
           if (attributes[i].value === value) {
-              console.log(attributes[i].label);
+              //console.log(attributes[i].label);
               return attributes[i].label; 
           }
       }
@@ -89,10 +90,10 @@ function App() {
 
   const colorScale = scaleOrdinal()
     .domain(data.map(d=> d.species))
-    .range(['#137B80', '#358013', '#681380']); //[] array of unique species
+    .range(['#bb5f32', '#358013', '#681380']); //[] array of unique species
+    /*
       console.log("colorScale.domain", colorScale.domain());
       console.log("colorScale.range", colorScale.range());
-    /*
     */
 
 
@@ -106,7 +107,6 @@ function App() {
 
   return (
       <>
-      
           <div className="select-outer">
               <div className="select-inner">
                   <label>X:</label>
@@ -129,7 +129,25 @@ function App() {
               </div>
           </div>
             <svg width={width} height={height}>
+                // ColorLegend 
               <g transform={`translate(${margin.left},${margin.top})`}>
+                  <text
+                    className="axis-label"
+                    textAnchor="middle"
+                    transform={`translate(${innerWidth+80},${30})`}
+                  >{colorLegendLabel}</text>
+                  <g className="legend" transform={`translate(${innerWidth+20},${60})`}>
+                  {
+                      colorScale.domain().map((domainValue,i) => {
+                          return (
+                              <g className="legend-item" transform={`translate(40,${i*30})`}>
+                                <circle fill={colorScale(domainValue)} r={circleRadius} />
+                                <text dx=".75em" dy=".32em">{domainValue}</text>
+                              </g>
+                          )
+                      })
+                  }
+                  </g>
             // AxisBottom(xScale, innerHeight, xAxisTickFormat);
               { xScale.ticks().map((tickValue, i) => {
 
@@ -153,14 +171,14 @@ function App() {
               </text>
 
             // AxisLeft
-              { yScale.ticks().map(tickValue => {
+              { yScale.ticks().map((tickValue,i) => {
 
                 //console.log(tickValue);
                 return (
-                <g className="tick" key={tickValue} transform={`translate(0,${yScale(tickValue)})`}>
+                <g className="tick" key={i} transform={`translate(0,${yScale(tickValue)})`}>
                  <line x2={innerWidth} />
                   <text
-                    key={tickValue}
+                    key={i}
                     style={{ textAnchor: 'end' }}
                     x={-xTickOffset}
                     dy=".32em"
@@ -179,12 +197,12 @@ function App() {
             >
               {xAxisLabel}
             </text>
-
             // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
               {
                 /* */
-                data.map(d => (
+                data.map((d,i) => (
                   <circle
+                    key ={i}
                     className="mark"
                     fill={colorScale(colorValue(d))}
                     cx={xScale(xValue(d))}
