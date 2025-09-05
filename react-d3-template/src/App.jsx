@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { csv, scaleLinear, extent, format } from 'd3'
 import './App.css'
-import { Dropdown } from './Dropdown'
+import Select from 'react-dropdown-select'
 
 const csvUrl = 'https://gist.githubusercontent.com/loniefink/e8a217b8acd62b259c380b2a9ed01305/raw/4cd2462336bfc82dc11e5e10e0b6537c7fe5ff9d/iris.csv';
 
@@ -94,10 +94,28 @@ function App() {
 
   return (
       <>
-          <label htmlFor="x-select">X:</label>
-          <Dropdown options={attributes} id="x-select" selectedValue={xAttribute} onSelectedValueChange={setXAttribute}/>
-          <label htmlFor="y-select">Y:</label>
-          <Dropdown options={attributes} id="y-select" selectedValue={yAttribute} onSelectedValueChange={setYAttribute}/>
+      
+          <div className="select-outer">
+              <div className="select-inner">
+                  <label>X:</label>
+                  <Select
+                      className="select-x"
+                      options={attributes}
+                      placeholder={getLabel(xAttribute)} // default
+                      selectedValue={xAttribute}
+                      onChange={([{value}]) => setXAttribute(value)}
+                  />
+                  <label className="label-y">Y:</label>
+                      
+                  <Select
+                      className="select-y"
+                      options={attributes}
+                      placeholder={getLabel(yAttribute)} // default
+                      selectedValue={yAttribute}
+                      onChange={([{value}]) => setYAttribute(value)}
+                  />
+              </div>
+          </div>
             <svg width={width} height={height}>
               <g transform={`translate(${margin.left},${margin.top})`}>
             // AxisBottom(xScale, innerHeight, xAxisTickFormat);
