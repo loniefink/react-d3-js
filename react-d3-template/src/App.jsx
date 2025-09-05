@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { csv, scaleLinear, extent, format } from 'd3'
+import { csv, scaleLinear, scaleOrdinal, extent, format } from 'd3'
 import './App.css'
 import Select from 'react-dropdown-select'
 
@@ -52,6 +52,8 @@ function App() {
     return <pre>Loading...</pre>
   }
 
+  const uniqueSpecies = [...new Set(data.map(d=> d.species))];
+
   const getLabel = (value) => {
       for (let i=0; i< attributes.length; i++) {
           if (attributes[i].value === value) {
@@ -70,6 +72,7 @@ function App() {
   const xAxisLabel = getLabel(xAttribute);
   const yValue = d => d[yAttribute];
   const yAxisLabel = getLabel(yAttribute);
+  const colorValue = d => d.species;
 
 
   const siFormat = format('.2s');
@@ -83,6 +86,15 @@ function App() {
   const yScale = scaleLinear()
     .domain(extent(data,yValue))
     .range([0, innerHeight])
+
+  const colorScale = scaleOrdinal()
+    .domain(data.map(d=> d.species))
+    .range(['#137B80', '#358013', '#681380']); //[] array of unique species
+      console.log("colorScale.domain", colorScale.domain());
+      console.log("colorScale.range", colorScale.range());
+    /*
+    */
+
 
     const options1 = [];
     const options2 = [];
@@ -174,6 +186,7 @@ function App() {
                 data.map(d => (
                   <circle
                     className="mark"
+                    fill={colorScale(colorValue(d))}
                     cx={xScale(xValue(d))}
                     cy={yScale(yValue(d))}
                     r={circleRadius}

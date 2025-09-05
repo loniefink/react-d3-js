@@ -82,7 +82,9 @@ pre {
   fill: #635F5D;
 }
 .mark {
+  /* over-rides color from colorScale
   fill: #137B80;
+  */
 }
 .axis-label {
   font-size: 2.5em;
