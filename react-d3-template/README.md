@@ -1,5 +1,10 @@
 # React + Vite
 
+• adding mouseover to legend elements
+  1. render 
+  2. w/ interaction -triggers-> event listener
+  3. change state
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
