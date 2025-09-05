@@ -28,6 +28,12 @@ const colorLegendLabel = 'Species';
 
 /*
  *
+ * functions()
+ *
+ */
+
+/*
+ *
  * App() 
  *
  */
@@ -35,6 +41,7 @@ function App() {
   const [data, setData] = useState(null);
   const [xAttribute, setXAttribute] = useState(initialXAttribute);
   const [yAttribute, setYAttribute] = useState(initialYAttribute);
+  const [hoveredValue, setHoveredValue] = useState(null);
 
   useEffect(() => {
     const row = (d) => {
@@ -53,6 +60,7 @@ function App() {
     return <pre>Loading...</pre>
   }
 
+  console.log(hoveredValue);
   const uniqueSpecies = [...new Set(data.map(d=> d.species))];
 
   const getLabel = (value) => {
@@ -65,6 +73,11 @@ function App() {
       return attributes[0].label; 
   }
 
+  const onHover = (hoveredValue) => {
+    setHoveredValue(hoveredValue);
+    console.log(hoveredValue)
+  }
+
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
 
@@ -74,6 +87,8 @@ function App() {
   const yValue = d => d[yAttribute];
   const yAxisLabel = getLabel(yAttribute);
   const colorValue = d => d.species;
+
+  const filteredData = data.filter(d => hoveredValue == colorValue(d));
 
 
   const siFormat = format('.2s');
@@ -140,7 +155,7 @@ function App() {
                   {
                       colorScale.domain().map((domainValue,i) => {
                           return (
-                              <g className="legend-item" transform={`translate(40,${i*30})`}>
+                              <g className="legend-item" transform={`translate(40,${i*30})`} onMouseEnter={setHoveredValue => onHover(domainValue)}>
                                 <circle fill={colorScale(domainValue)} r={circleRadius} />
                                 <text dx=".75em" dy=".32em">{domainValue}</text>
                               </g>
@@ -200,7 +215,7 @@ function App() {
             // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
               {
                 /* */
-                data.map((d,i) => (
+                filteredData.map((d,i) => (
                   <circle
                     key ={i}
                     className="mark"
