@@ -24,6 +24,7 @@ const attributes = [
     { value: 'species', label: 'Species'}
 ];
 const colorLegendLabel = 'Species';
+const fadeOpacity = 0.2;
 
 
 /*
@@ -145,22 +146,28 @@ function App() {
           </div>
             <svg width={width} height={height}>
                 // ColorLegend 
-              <g transform={`translate(${margin.left},${margin.top})`}>
+              <g
+                  transform={`translate(${margin.left},${margin.top})`}
+              >
                   <text
                     className="axis-label"
                     textAnchor="middle"
                     transform={`translate(${innerWidth+80},${30})`}
                   >{colorLegendLabel}</text>
-                  <g className="legend" transform={`translate(${innerWidth+20},${60})`}>
+                  <g
+                      className="legend"
+                      transform={`translate(${innerWidth+20},${60})`}
+                      onMouseLeave={() => onHover(null)}
+                  >
                   {
                       colorScale.domain().map((domainValue,i) => {
                           return (
                               <g
+                                  key={i}
                                   className="legend-item"
                                   transform={`translate(40,${i*30})`}
                                   onMouseEnter={() => onHover(domainValue)}
-                                  onMouseLeave={() => onHover(null)}
-                                  opacity={hoveredValue && domainValue !== hoveredValue ? 0.2 : 1}
+                                  opacity={hoveredValue && domainValue !== hoveredValue ? fadeOpacity : 1}
                               >
                                 <circle fill={colorScale(domainValue)} r={circleRadius} />
                                 <text className="tick" dx=".75em" dy=".32em">{domainValue}</text>
@@ -219,7 +226,7 @@ function App() {
               {xAxisLabel}
             </text>
             // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
-          <g opacity={hoveredValue ? 0.2 : 1}>
+          <g opacity={hoveredValue ? fadeOpacity : 1}>
               {
                 /* */
                 data.map((d,i) => (
