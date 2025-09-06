@@ -8,7 +8,6 @@ pre {
 }
 .tick text {
   fill: #635F5D;
-  font-size: .75em;
 }
 .marks path.land {
   fill: #B3DBA4;
@@ -28,7 +27,7 @@ pre {
   stroke: none;
   stroke-width: 1px;
 }
-.marks path.latAndLongLines, .tick line {
+.marks path.latAndLongLines {
   fill: none;
   stroke: #ECECEC;
   stroke-width: 1px;
