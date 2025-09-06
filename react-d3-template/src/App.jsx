@@ -2,14 +2,14 @@ import React, { useState, useCallback, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { max, json, scaleSqrt, geoPath, geoNaturalEarth1, geoGraticule  } from 'd3'
 import { feature, mesh } from 'topojson-client';
-import { useWorldAtlas } from './useWorldAtlas'
-import { useData } from './useData'
-import { WorldMap } from './WorldMap'
-import { DateHistogram } from './DateHistogram'
+import { useWorldAtlas } from './Data/useWorldAtlas'
+import { useData } from './Data/useData'
+import { WorldMap } from './WorldMap/WorldMap'
+import { DateHistogram } from './MissingMigrants/DateHistogram'
 import './App.css'
 
 const width = 960;
-const height = 500;
+const height = 600;
 // used in circle fill w/ colors[r-1]
 const colors = [ '#000', '#444', '#666', '#777', '#888' ];
 /*
@@ -41,7 +41,7 @@ function App() {
         <g className="marks">
             //WorldMap calls MissingAndDead data
             <WorldMap dataWorld={dataWorld} dataMAD={dataMAD} />
-            <DateHistogram />
+            <DateHistogram height={height} width={width} dataMAD={dataMAD} />
         </g>
     </svg>
   )

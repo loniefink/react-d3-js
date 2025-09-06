@@ -1,6 +1,6 @@
 import { max, json, scaleSqrt, geoPath, geoNaturalEarth1, geoGraticule  } from 'd3'
 import { feature, mesh } from 'topojson-client';
-import { MissingMigrantsBubbles } from './MissingMigrantsBubbles';
+import { MissingMigrantsBubbles } from '../MissingMigrants/MissingMigrantsBubbles';
 
 const projection = geoNaturalEarth1(),
   path = geoPath(projection);
