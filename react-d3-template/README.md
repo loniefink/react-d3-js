@@ -1,5 +1,24 @@
 # React + Vite
 
+## Map of the World
+_Create Topographical map projection of country data on the world_
+
+### Topographical map
+[topo map](https://observablehq.com/@d3/world-map)
+
+  • topojson data requires transformation to geojson in memory for easier presentation w/ d3
+    - using bostocks topojson.feature - converts TopoJSON to GeoJSON
+    - split geoJSON to countries (-> land) and interiors (borders) 
+    - added latitude and longitude lines (graticules)
+
+### Countries data for projection
+[countries data](https://unpkg.com/world-atlas@2.0.2/countries-50m.json)
+
+• you can use [mapshaper](https://mapshaper.org/) to generate at various complexities (accuracies) and export them to various formats (Shapefile, GeoJSON, TopoJSON, JSON records, CSV, SVG)
+  ° [Line Shaper](https://bost.ocks.org/mike/simplify/) shows an example of this
+
+
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

@@ -32,39 +32,11 @@
     animation: logo-spin infinite 20s linear;
   }
 }
+
 .card {
   padding: 2em;
 }
+
 .read-the-docs {
   color: #888;
-}
-
-label {
-  font-size:1.5em;
-  display: inline-flex;
-  margin-right: .35em;
-  /*line-height: 1.5em; // using align-items: center*/
-  font-weight: bold;
-}
-.select-outer {
-  margin: 0 auto;
-  height: 3em;
-}
-.select-inner {
-  max-width: 750px; 
-  display: inline-flex; 
-  align-items: center;
-}
-.react-dropdown-select {
-  min-width: 300px;
-}
-.select-x {
-  margin-right: .25em;
-}
-.label-y {
-  margin-left: 1em;
-}
-.react-dropdown-select-item {
-  text-align: left;
-  margin-left: .5em;
 }
