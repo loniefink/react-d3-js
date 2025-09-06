@@ -1,110 +1,79 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { csv, max, scaleLog, scaleLinear, timeFormat, scaleTime, extent, format, timeMonths, histogram as bin, sum } from 'd3'
-import Select from 'react-dropdown-select'
-
+import { useRef, useEffect, useMemo } from 'react';
+import { max, scaleLinear, timeFormat, scaleTime, extent, timeMonths, histogram as bin, sum, brushX, select, event } from 'd3'
+import { AxisBottom } from './AxisBottom'
+import { AxisLeft } from './AxisLeft'
 
 const initialXAttribute = 'date';
 const initialYAttribute = 'dead';
-
-export const DateHistogram = ({dataMAD, height, width}) => {
-  const [xAttribute, setXAttribute] = useState(initialXAttribute);
-  const [yAttribute, setYAttribute] = useState(initialYAttribute);
-
-  const margin = { top: 400, right: 30, bottom: 65, left: 90 };
-  const xAxisLabelOffset = 56;
-  const yAxisLabelOffset = 45;
-  const xTickOffset = 7;
-  const yTickOffset = 10;
-  const circleRadius = 2;
-  const attributes = [
-    { value: 'dead', label: 'Total Dead and Missing'},
-    { value: 'date', label: 'Incident Date'},
-    { value: 'coord', label: 'Coordinates'},
-  ];
+const xAxisTickFormat = timeFormat("%m-%Y")
+// placeholders for useState functions that were rm
+const xAttribute = initialXAttribute;
+const yAttribute = initialYAttribute;
+// xValue returns date
+const xValue = d => d[xAttribute];
+const yValue = d => d[yAttribute];
+// window settings
+const margin = { top: 400, right: 30, bottom: 65, left: 90 };
+const xTickOffset = 7;
+const yTickOffset = 10;
 
 
+
+export const DateHistogram = ({data, height, width, setBrushExtent}) => {
   const innerHeight = height - margin.top - margin.bottom;
   const innerWidth = width - margin.left - margin.right;
 
-  // xValue returns petal_length
-  const xValue = d => d[xAttribute];
-  const yValue = d => d[yAttribute];
-
-  const xAxisTickFormat = timeFormat("%m-%Y")
-
-  const xScale = scaleTime()
-    .domain(extent(dataMAD,xValue))
+  const xScale = useMemo(() => scaleTime()
+    .domain(extent(data,xValue))
     .range([0, innerWidth])
-    .nice();
+    .nice(), [data, innerWidth, xValue]);
+  // xScale defined below, uses aggData (ie. aggregate data)
 
-
-  const [start, stop] = xScale.domain();
-
-  const binnedData = bin()
+  const binnedData = useMemo(() => {
+    const [start, stop] = xScale.domain();
+    return bin()
     .value(xValue)
     .domain(xScale.domain())
-    .thresholds(timeMonths(start, stop))(dataMAD);
-  const aggData = binnedData
+    .thresholds(timeMonths(start, stop))(data)}, [data, xValue, xScale, yValue])
+  const aggData = useMemo(() => { 
+    return binnedData 
     .map(array => ({
       totalDeadAndMissing: sum(array,yValue),
       x0: array.x0,
       x1: array.x1
-    }))
-  //console.log("aggData", aggData);
-  //console.log("binnedData", binnedData);
+    }))},[binnedData, yValue]);
 
-  const yScale = scaleLinear()
+  const yScale = useMemo(() => {
+    console.log('yScale');
+    return scaleLinear()
     .domain([0, max(aggData, d=> d.totalDeadAndMissing)])
-    .range([innerHeight, 0])
+    .range([innerHeight, 0])}, [aggData, innerHeight] );
 
-  console.log(yScale.domain())
+  //console.log("[[0,0],[",width-margin.right, innerHeight,"]]");
 
+  // brushRef is used for selection on histogram via the ref=brushRef on the g tag below
+  const brushRef = useRef();
 
-  const options1 = [];
-  const options2 = [];
-  const options3 = [];
-  const selectedValue = '';
-  //console.log(scaleLinear().ticks());
-  //console.log("DateHistogram Called");
-
+  useEffect(() => {
+    const brush = brushX()
+      .extent([[0,0],[innerWidth, innerHeight]]);
+      brush(select(brushRef.current));
+      brush.on('brush end', () => {
+        setBrushExtent(event.selection && event.selection.map(xScale.invert));
+      });
+  }, [innerWidth, innerHeight]);
   return (
     <>
     <rect  transform={`translate(0,${margin.top})`} fill="#FFF" height={innerHeight} width={width} />
     <g transform={`translate(${margin.left},${margin.top})`}>
-    // AxisBottom(xScale, innerHeight, xAxisTickFormat);
-    { xScale.ticks().map((tickValue, i) => (
-      <g className="tick" key={i} transform={`translate(${xScale(tickValue)},0)`}>
-      <line y2={innerHeight} />
-      <text key={tickValue} style={{ textAnchor: 'middle' }} dy=".71em" y={innerHeight + yTickOffset}>
-      {xAxisTickFormat(tickValue)}
-      </text>
-      </g>
-    ))}
 
-    // AxisLeft
-    { yScale.ticks().map(tickValue => {
-
-      //console.log(tickValue);
-      return (
-        <g className="tick" key={tickValue} transform={`translate(0,${yScale(tickValue)})`}>
-        <line x2={innerWidth} />
-        <text
-        key={tickValue}
-        style={{ textAnchor: 'end' }}
-        x={-xTickOffset}
-        dy=".32em"
-        >
-        {tickValue}
-        </text>
-        </g>
-      )})}
-
+    <AxisBottom xScale={xScale} innerHeight={innerHeight} xAxisTickFormat={xAxisTickFormat} yTickOffset={yTickOffset} />
+    <AxisLeft yScale={yScale} innerWidth={innerWidth} xTickOffset={xTickOffset} />
     // Marks ( data, xScale, yScale, xValue, yValue, tooltipFormat ) 
     {
-      /* */
-      aggData.map(d => (
+      aggData.map((d, i) => (
         <rect
+        key={i}
         className="mark"
         x={xScale(d.x0)}
         y={yScale(d.totalDeadAndMissing)}
@@ -116,6 +85,7 @@ export const DateHistogram = ({dataMAD, height, width}) => {
       ))
     }
 
+    <g ref={brushRef} />
     </g>
     </>
   )
